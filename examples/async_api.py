@@ -1,8 +1,8 @@
 import asyncio
-from ws_redis.api_async import WSAPIHandler
+from ws_redis.api_async import APIClientListner
 
 
-class MyWSHandler(WSAPIHandler):
+class MyWSHandler(APIClientListner):
 
     @asyncio.coroutine
     def on_message(self, message):

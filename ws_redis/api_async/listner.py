@@ -9,7 +9,7 @@ from ws_redis.api_async.message import Message
 os.environ['PYTHONASYNCIODEBUG'] = '1'
 
 
-class WSAPIHandler():
+class APIClientListner(object):
 
     @asyncio.coroutine
     def run_listner(self, redis_connection):
@@ -41,7 +41,7 @@ class WSAPIHandler():
         overide this method for your user case
         """
         # do something
-        print('in basic on message function')
+        print('in basic on_message function')
         pass
 
     @asyncio.coroutine
