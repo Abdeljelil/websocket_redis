@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 from websockets.exceptions import ConnectionClosed
-from ws_redis.common.redis_manager import RedisManager
+from ws_redis.common.redis_manager import RedisManagerAIO
 from ws_redis.server.ws_handler import WSHandler
 import os
 
@@ -66,7 +66,7 @@ class WSServer(object):
     @asyncio.coroutine
     def run_server(cls, ws_connection, redis_connection):
 
-        redis_manager = RedisManager(**redis_connection)
+        redis_manager = RedisManagerAIO(**redis_connection)
 
         yield from redis_manager.init()
 

@@ -2,7 +2,7 @@ import aioredis
 import asyncio
 import json
 import os
-from ws_redis.common.redis_manager import RedisManager
+from ws_redis.common.redis_manager import RedisManagerAIO
 from ws_redis.api_async.message import Message
 
 
@@ -17,7 +17,7 @@ class APIClientListner(object):
         connect to redis and keep listing on api-channel
         """
 
-        redis_manager = RedisManager(**redis_connection)
+        redis_manager = RedisManagerAIO(**redis_connection)
 
         yield from redis_manager.init()
         self.redis = redis_manager.redis_global_connection
