@@ -1,8 +1,8 @@
 import asyncio
 import websockets
 from websockets.exceptions import ConnectionClosed
-from ws_redis.common.redis_manager import RedisManagerAIO
-from ws_redis.server.ws_handler import WSHandler
+from websocket_redis.common.redis_manager import RedisManagerAIO
+from websocket_redis.server.ws_handler import WSHandler
 import os
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'
@@ -10,9 +10,10 @@ os.environ['PYTHONASYNCIODEBUG'] = '1'
 
 class WSServer(object):
 
-    def __init__(self, redis_manager):
+    def __init__(self, redis_manager, app_name):
 
         self.redis_manager = redis_manager
+        self.app_name = app_name
 
     @asyncio.coroutine
     def init(self):
@@ -27,7 +28,8 @@ class WSServer(object):
         """
 
         client = path.split("/")[-1]
-        ws_handler = WSHandler(websocket, client, self.redis_manager)
+        ws_handler = WSHandler(
+            websocket, client, self.redis_manager, self.app_name)
         yield from ws_handler.init()
         try:
             producer_task = None
@@ -64,13 +66,13 @@ class WSServer(object):
 
     @classmethod
     @asyncio.coroutine
-    def run_server(cls, ws_connection, redis_connection):
+    def run_server(cls, ws_connection, redis_connection, app_name="myapp"):
 
         redis_manager = RedisManagerAIO(**redis_connection)
 
         yield from redis_manager.init()
 
-        ws_handler = cls(redis_manager)
+        ws_handler = cls(redis_manager, app_name)
 
         print("Strting ws server {}".format(ws_connection))
         yield from websockets.serve(

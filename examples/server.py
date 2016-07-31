@@ -1,5 +1,5 @@
 import asyncio
-from ws_redis.server import WSServer
+from websocket_redis.server import WSServer
 
 
 ws_connection = dict(
@@ -7,12 +7,12 @@ ws_connection = dict(
     port=5678)
 
 redis_connection = dict(
-    address=("178.18.31.65", 6666)
+    address=("localhost", 6379)
 )
 
 loop = asyncio.get_event_loop()
 
 loop.run_until_complete(WSServer.run_server(
-    ws_connection, redis_connection))
+    ws_connection, redis_connection, app_name="my_app"))
 loop.run_forever()
 loop.close()

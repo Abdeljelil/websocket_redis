@@ -1,5 +1,5 @@
 import asyncio
-from ws_redis.server import WSServer
+from websocket_redis.server import WSServer
 import ssl
 
 # openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days
@@ -15,7 +15,7 @@ context.load_cert_chain(certfile="./ssl/cert.pem",
                         keyfile="./ssl/key.pem")
 
 redis_connection = dict(
-    address=("178.18.31.65", 6666),
+    address=("localhost", 6397),
     ssl=context)
 
 loop = asyncio.get_event_loop()

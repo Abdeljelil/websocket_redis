@@ -7,7 +7,7 @@ from uuid import uuid1
 
 class WSHandler():
 
-    def __init__(self, websocket, client_id, redis_manager):
+    def __init__(self, websocket, client_id, redis_manager, app_name):
         """
         """
         self.websocket = websocket
@@ -15,6 +15,7 @@ class WSHandler():
         self.session_id = str(uuid1())
         self.redis = redis_manager.redis_global_connection
         self.redis_manager = redis_manager
+        self.app_name = app_name
 
     @asyncio.coroutine
     def init(self):
@@ -26,7 +27,8 @@ class WSHandler():
 
         self.redis_sub = yield from self.redis_manager.get_sub_connection()
 
-        channels = yield from self.redis_sub.subscribe(self.client)
+        channel_name = "{}:{}".format(self.app_name, self.client)
+        channels = yield from self.redis_sub.subscribe(channel_name)
         self.channel = channels[0]
         if isinstance(self.channel, aioredis.Channel) is False:
             print("Unable to join Redis channel")
@@ -60,7 +62,7 @@ class WSHandler():
                           create_on=str(datetime.datetime.now())
                           )
 
-        yield from self.redis.publish("api_channel", json.dumps(msg_to_api))
+        yield from self.redis.publish(self.app_name, json.dumps(msg_to_api))
 
         # print(self.session_id, "message: {} {}".format(message, self.client))
 

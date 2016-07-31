@@ -1,5 +1,5 @@
 import asyncio
-from ws_redis.api_async import APIClientListner
+from websocket_redis.api_async import APIClientListner
 
 
 class MyWSHandler(APIClientListner):
@@ -15,9 +15,10 @@ class MyWSHandler(APIClientListner):
 if __name__ == "__main__":
 
     redis_connection = dict(
-        address=("178.18.31.65", 6666)
+        address=("localhost", 6379)
     )
     handler = MyWSHandler()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(handler.run_listner(redis_connection))
+    loop.run_until_complete(handler.run_listner(
+        redis_connection, app_name="my_app"))
     loop.close()

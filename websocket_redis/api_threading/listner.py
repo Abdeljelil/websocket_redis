@@ -1,5 +1,5 @@
-from ws_redis.common.redis_manager import RedisManager
-from ws_redis.api_threading.message import Message
+from websocket_redis.common.redis_manager import RedisManager
+from websocket_redis.api_threading.message import Message
 
 import json
 import time
@@ -8,14 +8,15 @@ from threading import Thread
 
 class APIClientListner(object):
 
-    def run_listner(self, redis_connection):
+    def run_listner(self, redis_connection, app_name):
 
+        self.app_name = app_name
         redis_manager = RedisManager(**redis_connection)
         redis_manager.init()
         self.redis = redis_manager.redis_global_connection
 
         redis_sub = redis_manager.get_sub_connection()
-        redis_sub.subscribe("api_channel")
+        redis_sub.subscribe(self.app_name)
 
         while True:
             message = redis_sub.get_message()
@@ -48,4 +49,5 @@ class APIClientListner(object):
 
     def send(self, client_id, message):
         print("send message {} to {}".format(client_id, message))
-        self.redis.publish(client_id, message)
+        channel_name = "{}:{}".format(self.app_name, client_id)
+        self.redis.publish(channel_name, message)

@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="ws_redis",
+    name="websocket_redis",
     version="0.0.1",
     description='',
     long_description='''

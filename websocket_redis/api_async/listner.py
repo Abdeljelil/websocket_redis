@@ -2,8 +2,8 @@ import aioredis
 import asyncio
 import json
 import os
-from ws_redis.common.redis_manager import RedisManagerAIO
-from ws_redis.api_async.message import Message
+from websocket_redis.common.redis_manager import RedisManagerAIO
+from websocket_redis.api_async.message import Message
 
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'
@@ -12,18 +12,18 @@ os.environ['PYTHONASYNCIODEBUG'] = '1'
 class APIClientListner(object):
 
     @asyncio.coroutine
-    def run_listner(self, redis_connection):
+    def run_listner(self, redis_connection, app_name):
         """
         connect to redis and keep listing on api-channel
         """
-
+        self.app_name = app_name
         redis_manager = RedisManagerAIO(**redis_connection)
 
         yield from redis_manager.init()
         self.redis = redis_manager.redis_global_connection
         redis_sub = yield from redis_manager.get_sub_connection()
 
-        channels = yield from redis_sub.subscribe("api_channel")
+        channels = yield from redis_sub.subscribe(self.app_name)
         channel = channels[0]
         if isinstance(channel, aioredis.Channel) is False:
             print("Unable to join Redis channel")
@@ -47,4 +47,5 @@ class APIClientListner(object):
     @asyncio.coroutine
     def send(self, client_id, message):
         print("send message {} to {}".format(client_id, message))
-        yield from self.redis.publish(client_id, message)
+        channel_name = "{}:{}".format(self.app_name, client_id)
+        yield from self.redis.publish(channel_name, message)
