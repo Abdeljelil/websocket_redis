@@ -1,14 +1,19 @@
-from websocket_redis.common.redis_manager import RedisManager
-from websocket_redis.api_threading.message import Message
-
 import json
 import time
 from threading import Thread
 
+from websocket_redis.common.redis_manager import RedisManager
+from websocket_redis.api.threading.message import Message
+from websocket_redis.api import AbstractListener
 
-class APIClientListner(object):
 
-    def run_listner(self, redis_connection, app_name):
+class APIClientListener(AbstractListener):
+
+    def __init__(self):
+        self.app_name = None
+        self.redis = None
+
+    def run(self, redis_connection, app_name):
 
         self.app_name = app_name
         redis_manager = RedisManager(**redis_connection)
@@ -22,11 +27,11 @@ class APIClientListner(object):
             message = redis_sub.get_message()
             if message:
                 if message["type"] == 'message':
-                    self.run_in_thead(message["data"])
+                    self._run_in_thead(message["data"])
             else:
                 time.sleep(0.001)
 
-    def run_in_thead(self, raw_msg):
+    def _run_in_thead(self, raw_msg):
 
         str_msg = raw_msg.decode("utf-8")
 
@@ -36,16 +41,6 @@ class APIClientListner(object):
 
         thread = Thread(target=self.on_message, args=(message, ))
         thread.start()
-        print("new thread has been started")
-
-    def on_message(self, message):
-        """
-        overide this method for your user case
-        """
-        # do something
-        print('in basic on_message function')
-
-        self.send("")
 
     def send(self, client_id, message):
         print("send message {} to {}".format(client_id, message))

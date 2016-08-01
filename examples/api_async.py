@@ -1,15 +1,19 @@
 import asyncio
-from websocket_redis.api_async import APIClientListner
+import datetime
+
+from websocket_redis.api.async import APIClientListener
 
 
-class MyWSHandler(APIClientListner):
+class MyWSHandler(APIClientListener):
 
     @asyncio.coroutine
     def on_message(self, message):
 
         print(" in new on message function")
-        new_massage = "hi, {}".format(message.client_id)
-
+        new_massage = "async hi, {} , {}".format(
+            message.client_id,
+            datetime.datetime.now()
+        )
         yield from message.reply(new_massage)
 
 if __name__ == "__main__":
@@ -19,6 +23,6 @@ if __name__ == "__main__":
     )
     handler = MyWSHandler()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(handler.run_listner(
+    loop.run_until_complete(handler.run(
         redis_connection, app_name="my_app"))
     loop.close()

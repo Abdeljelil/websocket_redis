@@ -1,8 +1,9 @@
-import aioredis
-import asyncio
 import datetime
 import json
 from uuid import uuid1
+import asyncio
+
+import aioredis
 
 
 class WSHandler():
@@ -16,6 +17,8 @@ class WSHandler():
         self.redis = redis_manager.redis_global_connection
         self.redis_manager = redis_manager
         self.app_name = app_name
+        self.channel = None
+        self.redis_sub = None
 
     @asyncio.coroutine
     def init(self):
@@ -39,6 +42,7 @@ class WSHandler():
         this event runs when the client finish the session or
         an exception has been raised.
         """
+        print("Connection closed with code :{}".format(code))
         self.redis_sub.connection.close()
         print("Unsubscribed from {} channel".format(self.channel))
 
@@ -48,7 +52,7 @@ class WSHandler():
 
         """
         print(type(e))
-        print("++++ in error {}".format(e), self.session_id)
+        print("Error {}".format(e), self.session_id)
 
     @asyncio.coroutine
     def on_message(self, message):
@@ -56,6 +60,9 @@ class WSHandler():
         listing message from the client and push the message to Redis
         to broadcast it to the API
         """
+        print("Message recieved from {}, content: {}".format(
+            self.client, message))
+
         msg_to_api = dict(client_id=self.client,
                           session_id=self.session_id,
                           message=message,
@@ -63,8 +70,6 @@ class WSHandler():
                           )
 
         yield from self.redis.publish(self.app_name, json.dumps(msg_to_api))
-
-        # print(self.session_id, "message: {} {}".format(message, self.client))
 
     @asyncio.coroutine
     def send(self):

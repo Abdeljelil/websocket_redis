@@ -1,18 +1,24 @@
-import aioredis
-import asyncio
 import json
 import os
-from websocket_redis.common.redis_manager import RedisManagerAIO
-from websocket_redis.api_async.message import Message
+import asyncio
 
+import aioredis
+
+from websocket_redis.common.redis_manager import RedisManagerAIO
+from websocket_redis.api.async.message import Message
+from websocket_redis.api import AbstractListener
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'
 
 
-class APIClientListner(object):
+class APIClientListener(AbstractListener):
+
+    def __init__(self):
+        self.redis = None
+        self.app_name = None
 
     @asyncio.coroutine
-    def run_listner(self, redis_connection, app_name):
+    def run(self, redis_connection, app_name):
         """
         connect to redis and keep listing on api-channel
         """
@@ -34,15 +40,6 @@ class APIClientListner(object):
             decoded_msg = json.loads(msg)
             message = Message(self, **decoded_msg)
             yield from self.on_message(message)
-
-    @asyncio.coroutine
-    def on_message(self, message):
-        """
-        overide this method for your user case
-        """
-        # do something
-        print('in basic on_message function')
-        pass
 
     @asyncio.coroutine
     def send(self, client_id, message):

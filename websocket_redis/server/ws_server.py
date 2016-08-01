@@ -1,9 +1,10 @@
+import os
 import asyncio
+
 import websockets
 from websockets.exceptions import ConnectionClosed
 from websocket_redis.common.redis_manager import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
-import os
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'
 
@@ -31,38 +32,34 @@ class WSServer(object):
         ws_handler = WSHandler(
             websocket, client, self.redis_manager, self.app_name)
         yield from ws_handler.init()
-        try:
-            producer_task = None
-            listener_task = None
-            while True:
 
-                if listener_task is None or listener_task.get_stack() == []:
-                    listener_task = asyncio.async(websocket.recv())
+        producer_task = None
+        listener_task = None
+        while True:
 
-                if producer_task is None or producer_task.get_stack() == []:
-                    producer_task = asyncio.async(ws_handler.send())
+            if listener_task is None or listener_task.get_stack() == []:
+                listener_task = asyncio.ensure_future(websocket.recv())
 
-                done, pending = yield from asyncio.wait(
-                    [listener_task, producer_task],
-                    return_when=asyncio.FIRST_COMPLETED)
+            if producer_task is None or producer_task.get_stack() == []:
+                producer_task = asyncio.ensure_future(ws_handler.send())
 
-                if listener_task in done:
-                    try:
-                        message = listener_task.result()
-                        yield from ws_handler.on_message(message)
-                    except ConnectionClosed as e:
-                        yield from ws_handler.on_error(e)
-                        yield from ws_handler.on_close(e.code)
-                        producer_task.cancel()
-                        break
+            done, _ = yield from asyncio.wait(
+                [listener_task, producer_task],
+                return_when=asyncio.FIRST_COMPLETED)
 
-                if producer_task in done:
-                    message = producer_task.result()
-                    yield from websocket.send(message)
+            if listener_task in done:
+                try:
+                    message = listener_task.result()
+                    yield from ws_handler.on_message(message)
+                except ConnectionClosed as ecc:
+                    yield from ws_handler.on_error(ecc)
+                    yield from ws_handler.on_close(ecc.code)
+                    producer_task.cancel()
+                    break
 
-        except Exception as e:
-            yield from ws_handler.on_error(e)
-            yield from ws_handler.on_close(1001)
+            if producer_task in done:
+                message = producer_task.result()
+                yield from websocket.send(message)
 
     @classmethod
     @asyncio.coroutine

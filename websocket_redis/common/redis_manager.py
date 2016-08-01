@@ -1,6 +1,7 @@
-import aioredis
 import asyncio
+
 import redis
+import aioredis
 
 
 class RedisManager(object):
@@ -15,6 +16,7 @@ class RedisManager(object):
         self.db = db
         self.password = password
         self.conn_kw = kwargs
+        self.redis_global_connection = None
 
     def _get_connection(self):
         """
@@ -59,6 +61,7 @@ class RedisManagerAIO(object):
         self.ssl = ssl
         self.encoding = encoding
         self.loop = loop
+        self.redis_global_connection = None
 
     @asyncio.coroutine
     def _get_connection(self):

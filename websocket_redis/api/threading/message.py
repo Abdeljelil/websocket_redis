@@ -1,8 +1,10 @@
 import json
 import datetime
 
+from websocket_redis.api import AbstractMessage
 
-class Message(object):
+
+class Message(AbstractMessage):
 
     def __init__(self, handler, *, session_id=None,
                  client_id=None, message=None, create_on=None):
