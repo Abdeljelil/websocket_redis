@@ -38,10 +38,10 @@ class WSServer(object):
         while True:
 
             if listener_task is None or listener_task.get_stack() == []:
-                listener_task = asyncio.ensure_future(websocket.recv())
+                listener_task = asyncio.async(websocket.recv())
 
             if producer_task is None or producer_task.get_stack() == []:
-                producer_task = asyncio.ensure_future(ws_handler.send())
+                producer_task = asyncio.async(ws_handler.send())
 
             done, _ = yield from asyncio.wait(
                 [listener_task, producer_task],
