@@ -4,14 +4,15 @@ from setuptools import setup, find_packages
 import sys
 
 py_version = sys.version_info[:2]
-print(py_version)
-print(find_packages())
+
 if py_version < (3, 3):
     install_requires = ["redis"]
 
     packages = find_packages(exclude=(
+        "websocket_redis.common.aioredis",
         "websocket_redis.api.async",
         "websocket_redis.server",
+        #"websocket_redis"
     ))
 else:
     install_requires = [
@@ -21,12 +22,10 @@ else:
     ]
     packages = find_packages()
 
-print(find_packages())
 setup(
     name="websocket_redis",
     version="0.0.1",
-    description='Communicate with client through '
-    'websocket and redis as messaging broker',
+    description='Communicate with client through redis as messaging broker',
     long_description='''
 ''',
     keywords='python websocket API redis asyncio',
@@ -51,3 +50,8 @@ setup(
         ],
     },
 )
+
+
+print(py_version)
+print(packages)
+print(find_packages())

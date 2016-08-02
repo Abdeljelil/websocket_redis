@@ -3,7 +3,7 @@ import asyncio
 
 import websockets
 from websockets.exceptions import ConnectionClosed
-from websocket_redis.common.redis_manager import RedisManagerAIO
+from websocket_redis.common.aioredis import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'

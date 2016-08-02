@@ -1,4 +1,3 @@
-import asyncio
 from websocket_redis.api.threading import APIClientListener
 import datetime
 
@@ -22,7 +21,6 @@ if __name__ == "__main__":
         port=6379
     )
     handler = MyWSHandler()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(handler.run(
-        redis_connection, app_name="my_app"))
-    loop.close()
+
+    handler.run(
+        redis_connection, app_name="my_app")
