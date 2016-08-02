@@ -26,4 +26,4 @@ publish:
 clean:
 	find . -name '*.pyc' -delete
 	find . -name __pycache__ -delete
-	rm -rf .coverage build compliance/reports dist docs/_build htmlcov MANIFEST README.rst websocket_redis.egg-info
+	rm -rf .coverage build compliance/reports dist docs/_build htmlcov MANIFEST websocket_redis.egg-info

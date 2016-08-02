@@ -1,17 +1,38 @@
 import datetime
 import json
 from uuid import uuid1
+import abc
 import asyncio
+import logging
 
 import aioredis
 
+logger = logging.getLogger(__name__)
 
-class WSHandler():
 
-    def __init__(self, websocket, client_id, redis_manager, app_name):
+class WSHandler(object):
+
+    def __init__(self, client_id, redis_manager, app_name):
         """
+        Args:
+            client_id: str, client id who opened the websocket session.
+            redis_manager: RedisManagerAIO instance to manage aioredis
+                        connections.
+            app_name : str, application name should be unique,
+                    because you can connect many websocket_redis services
+                    and app_name make the difference.
+
+        Members:
+            client : str, client id
+            session_id : str and uuid format,
+                    identify to the session opened for the client_id.
+            redis: Redis-connection
+            redis_manager: RedisManagerAIO instance
+            app_name: service name useful in channel name for push/sub redis
+            channel: client channel in push/sub redis
+            redis_sub: push/sub redis connection
         """
-        self.websocket = websocket
+
         self.client = client_id
         self.session_id = str(uuid1())
         self.redis = redis_manager.redis_global_connection
@@ -25,7 +46,9 @@ class WSHandler():
         """
         setup the new session
         Create new subscription connection to Redis
-        subscribe to Redis channel to the connected client
+        subscribe to Redis channel for the connected client
+
+        this method is coroutine
         """
 
         self.redis_sub = yield from self.redis_manager.get_sub_connection()
@@ -34,33 +57,86 @@ class WSHandler():
         channels = yield from self.redis_sub.subscribe(channel_name)
         self.channel = channels[0]
         if isinstance(self.channel, aioredis.Channel) is False:
-            print("Unable to join Redis channel")
+            logger.error(
+                "Unalbe to join Redis channel {}".format(channel_name))
 
     @asyncio.coroutine
-    def on_close(self, code):
+    def close(self, code):
         """
         this event runs when the client finish the session or
         an exception has been raised.
+        this method is coroutine
         """
-        print("Connection closed with code :{}".format(code))
-        self.redis_sub.connection.close()
-        print("Unsubscribed from {} channel".format(self.channel))
 
+        yield from self.on_close(code)
+
+        logger.info("Connection closed with code :{}".format(code))
+        self.redis_sub.connection.close()
+        channel_name = "{}:{}".format(self.app_name, self.client)
+        logger.info("Unsubscribed from {} channel".format(channel_name))
+
+    @abc.abstractmethod
+    @asyncio.coroutine
+    def on_close(self, code):
+        """
+        Override this method if you want to handle
+        on_close event.
+        Args :
+            code : websocket code error.
+
+        this method is coroutine
+        """
+        pass
+
+    @abc.abstractmethod
     @asyncio.coroutine
     def on_error(self, e):
         """
-
+        Override this method if you want to handle
+        on_error event.
+        Args:
+            e: exception object
+        this method is coroutine
         """
-        print(type(e))
-        print("Error {}".format(e), self.session_id)
+        pass
 
+    @abc.abstractmethod
     @asyncio.coroutine
     def on_message(self, message):
+        """
+        Override this method if you want to handle the receive of message
+        before the publish.
+        Args:
+            message : str, message has been sent
+                    form the client to web-socket server
+        this method is coroutine                
+        """
+        pass
+
+    @abc.abstractmethod
+    @asyncio.coroutine
+    def on_send(self, message):
+        """
+        Override this method if you want to add
+        extra work before the send of messages to client
+
+        Args:
+            message : str, message to send to client
+
+        this method is coroutine
+        """
+        pass
+
+    @asyncio.coroutine
+    def publish(self, message):
         """
         listing message from the client and push the message to Redis
         to broadcast it to the API
         """
-        print("Message recieved from {}, content: {}".format(
+
+        yield from self.on_message(message)
+
+        logger.info("Message received from {}, content: {}".format(
             self.client, message))
 
         msg_to_api = dict(client_id=self.client,
@@ -79,9 +155,10 @@ class WSHandler():
         """
         while (yield from self.channel.wait_message()):
             wrapped_msg = yield from self.channel.get(encoding='utf-8')
+            yield from self.on_send(wrapped_msg)
             decoded_msg = json.loads(wrapped_msg)
             message = decoded_msg["message"]
-            print("{} message in {}: {}".format(
+            logger.info("{} message in {}: {}".format(
                 self.session_id, self.channel.name, message))
             return message
         return None

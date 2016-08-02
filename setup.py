@@ -4,12 +4,12 @@ import sys
 import os
 
 
-version = ("0", "0", "3")
+version = ("0", "0", "4")
 
 
 root = os.path.dirname(__file__)
 
-with open(os.path.join(root, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(root, 'README.md')) as f:
     long_description = '\n\n'.join(f.read().split('\n\n')[1:])
 
 py_version = sys.version_info[:2]
