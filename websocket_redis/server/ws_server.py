@@ -7,7 +7,6 @@ from websocket_redis.common.aioredis import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
 
 
 class WSServer(object):
@@ -71,5 +70,6 @@ class WSServer(object):
         yield from self.redis_manager.init()
 
         logger.info("Strting ws server {}".format(self.ws_connection))
+
         yield from websockets.serve(
             self.ws_handler_engine, **self.ws_connection)

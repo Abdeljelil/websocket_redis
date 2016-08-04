@@ -155,9 +155,12 @@ class WSHandler(object):
         """
         while (yield from self.channel.wait_message()):
             wrapped_msg = yield from self.channel.get(encoding='utf-8')
-            yield from self.on_send(wrapped_msg)
+
             decoded_msg = json.loads(wrapped_msg)
             message = decoded_msg["message"]
+
+            yield from self.on_send(message)
+
             logger.info("{} message in {}: {}".format(
                 self.session_id, self.channel.name, message))
             return message

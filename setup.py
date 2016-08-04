@@ -28,7 +28,7 @@ else:
         "aioredis",
         "redis"
     ]
-    packages = find_packages()
+    packages = find_packages(exclude=["tests"])
 
 setup(
     name="websocket_redis",
@@ -41,9 +41,11 @@ setup(
     url='https://github.com/Abdeljelil/websocket_redis',
     download_url="https://github.com/Abdeljelil/websocket_redis.git",
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: Unix',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],

@@ -2,12 +2,9 @@
 
 import asyncio
 import websockets
-import os
 import sys
 
 websocket = None
-
-os.environ['PYTHONASYNCIODEBUG'] = '1'
 
 
 @asyncio.coroutine
@@ -16,7 +13,7 @@ def send(websocket):
     try:
         i = 0
         while True:
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(2)
             yield from websocket.send("from client")
             print("send to server {}".format(i))
 

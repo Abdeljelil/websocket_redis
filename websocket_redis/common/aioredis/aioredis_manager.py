@@ -40,7 +40,7 @@ class RedisManagerAIO(object):
         create new Redis global connection
         this function is coroutine
         """
-        print("create new Redis instance")
+
         self.redis_global_connection = yield from self._get_connection()
 
     @asyncio.coroutine

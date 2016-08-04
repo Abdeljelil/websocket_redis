@@ -4,7 +4,14 @@ import datetime
 from websocket_redis.api.async import APIClientListener
 
 
-class MyWSHandler(APIClientListener):
+@asyncio.coroutine
+def iowait(val):
+    print("in sleep")
+    yield from asyncio.sleep(val)
+    print("end sleep")
+
+
+class MyAPIClientListener(APIClientListener):
 
     @asyncio.coroutine
     def on_message(self, message):
@@ -21,8 +28,7 @@ if __name__ == "__main__":
     redis_connection = dict(
         address=("localhost", 6379)
     )
-    handler = MyWSHandler()
+    handler = MyAPIClientListener(redis_connection, app_name="test_app")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(handler.run(
-        redis_connection, app_name="my_app"))
-    loop.close()
+
+    loop.run_until_complete(handler.run())

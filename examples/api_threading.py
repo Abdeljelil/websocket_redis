@@ -2,7 +2,7 @@ from websocket_redis.api.threading import APIClientListener
 import datetime
 
 
-class MyWSHandler(APIClientListener):
+class MyAPIClientListener(APIClientListener):
 
     def on_message(self, message):
 
@@ -20,7 +20,6 @@ if __name__ == "__main__":
         host="localhost",
         port=6379
     )
-    handler = MyWSHandler()
+    handler = MyAPIClientListener(redis_connection, app_name="test_app")
 
-    handler.run(
-        redis_connection, app_name="my_app")
+    handler.run()

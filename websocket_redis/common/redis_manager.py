@@ -33,7 +33,7 @@ class RedisManager(object):
         """
         create new Redis global connection
         """
-        print("create new Redis instance")
+
         self.redis_global_connection = self._get_connection()
 
     def get_sub_connection(self):

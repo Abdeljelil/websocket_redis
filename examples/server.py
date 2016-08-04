@@ -19,13 +19,13 @@ class MyWSHandler(WSHandler):
     @asyncio.coroutine
     def on_message(self, message):
 
-        print("New message \'{}\' has been received for client : {}".format(
+        print("Receice message \'{}\' has been received for client : {}".format(
             message, self.client))
 
     @asyncio.coroutine
     def on_send(self, message):
 
-        print("New message \'{}\' will be send to {}".format(
+        print("Send message \'{}\' will be send to {}".format(
             message, self.client))
 
 if __name__ == "__main__":
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     server = WSServer(
         ws_connection=ws_connection,
         redis_connection=redis_connection,
-        app_name="my_app",
+        app_name="test_app",
         ws_handler_class=MyWSHandler
     )
 
