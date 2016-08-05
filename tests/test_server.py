@@ -1,11 +1,12 @@
-import unittest
 import asyncio
-import websockets
 import logging
+import unittest
 
-from websocket_redis.server import WSServer, WSHandler
+import websockets
+
 from websocket_redis.api.async import APIClientListener
 from websocket_redis.common import asyncio_ensure_future
+from websocket_redis.server import WSHandler, WSServer
 
 # Avoid displaying stack traces at the ERROR logging level.
 logging.basicConfig(level=logging.CRITICAL)

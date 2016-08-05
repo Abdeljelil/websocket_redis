@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
-import sys
 import os
+import sys
 
+from setuptools import find_packages, setup
 
-version = ("0", "0", "4")
+version = ("0", "0", "5")
 
 
 root = os.path.dirname(__file__)

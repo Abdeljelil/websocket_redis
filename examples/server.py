@@ -1,5 +1,6 @@
 import asyncio
-from websocket_redis.server import WSServer, WSHandler
+
+from websocket_redis.server import WSHandler, WSServer
 
 
 class MyWSHandler(WSHandler):

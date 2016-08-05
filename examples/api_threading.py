@@ -1,5 +1,6 @@
-from websocket_redis.api.threading import APIClientListener
 import datetime
+
+from websocket_redis.api.threading import APIClientListener
 
 
 class MyAPIClientListener(APIClientListener):

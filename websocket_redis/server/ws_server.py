@@ -3,9 +3,10 @@ import logging
 
 import websockets
 from websockets.exceptions import ConnectionClosed
+
+from websocket_redis.common import asyncio_ensure_future
 from websocket_redis.common.aioredis import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
-from websocket_redis.common import asyncio_ensure_future
 
 logger = logging.getLogger(__name__)
 

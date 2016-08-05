@@ -1,12 +1,12 @@
+import asyncio
 import json
 import logging
-import asyncio
 
 import aioredis
 
-from websocket_redis.common.aioredis import RedisManagerAIO
-from websocket_redis.api.async.message import Message
 from websocket_redis.api import AbstractListener
+from websocket_redis.api.async.message import Message
+from websocket_redis.common.aioredis import RedisManagerAIO
 
 logger = logging.getLogger(__name__)
 

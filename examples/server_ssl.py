@@ -1,6 +1,7 @@
 import asyncio
-from websocket_redis.server import WSServer
 import ssl
+
+from websocket_redis.server import WSServer
 
 # openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days
 # 300 -nodes

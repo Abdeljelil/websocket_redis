@@ -1,11 +1,11 @@
 import json
-import time
 import logging
+import time
 from threading import Thread
 
-from websocket_redis.common.redis_manager import RedisManager
-from websocket_redis.api.threading.message import Message
 from websocket_redis.api import AbstractListener
+from websocket_redis.api.threading.message import Message
+from websocket_redis.common.redis_manager import RedisManager
 
 logger = logging.getLogger(__name__)
 

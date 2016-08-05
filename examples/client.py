@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import asyncio
-import websockets
 import sys
+
+import websockets
 
 websocket = None
 

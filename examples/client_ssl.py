@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import asyncio
-import websockets
 import os
-import sys
 import ssl
+import sys
+
+import websockets
 
 websocket = None
 

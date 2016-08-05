@@ -1,7 +1,7 @@
 import asyncio
-import aioredis
 import logging
 
+import aioredis
 
 logger = logging.getLogger(__name__)
 
