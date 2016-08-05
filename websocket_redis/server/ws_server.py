@@ -5,6 +5,7 @@ import websockets
 from websockets.exceptions import ConnectionClosed
 from websocket_redis.common.aioredis import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
+from websocket_redis.common import asyncio_ensure_future
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,20 @@ class WSServer(object):
         self.app_name = app_name
         self.ws_handler_class = ws_handler_class
         self.redis_manager = None
+        self.server = None
+
+    def close(self):
+
+        self.server.close()
+
+        try:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                asyncio.wait_for(self.server.wait_closed(), timeout=1))
+        except asyncio.TimeoutError:
+            logger.warning("Server failed to stop")
+
+        self.redis_manager.close()
 
     @asyncio.coroutine
     def ws_handler_engine(self, websocket, path):
@@ -39,10 +54,10 @@ class WSServer(object):
         while True:
 
             if listener_task is None or listener_task.get_stack() == []:
-                listener_task = asyncio.async(websocket.recv())
+                listener_task = asyncio_ensure_future(websocket.recv())
 
             if producer_task is None or producer_task.get_stack() == []:
-                producer_task = asyncio.async(ws_handler.send())
+                producer_task = asyncio_ensure_future(ws_handler.send())
 
             done, _ = yield from asyncio.wait(
                 [listener_task, producer_task],
@@ -71,5 +86,7 @@ class WSServer(object):
 
         logger.info("Strting ws server {}".format(self.ws_connection))
 
-        yield from websockets.serve(
+        self.server = yield from websockets.serve(
             self.ws_handler_engine, **self.ws_connection)
+
+        return self.server

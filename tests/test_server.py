@@ -1,11 +1,14 @@
 import unittest
 import asyncio
-import logging
 import websockets
+import logging
 
 from websocket_redis.server import WSServer, WSHandler
 from websocket_redis.api.async import APIClientListener
+from websocket_redis.common import asyncio_ensure_future
 
+# Avoid displaying stack traces at the ERROR logging level.
+logging.basicConfig(level=logging.CRITICAL)
 
 APP_NAME = 'test_app'
 WS_PORT = 5678
@@ -13,8 +16,6 @@ WS_PORT = 5678
 REDIS_CONNECTION = dict(
     address=("localhost", 6379)
 )
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class MyAPIClientListener(APIClientListener):
@@ -22,7 +23,7 @@ class MyAPIClientListener(APIClientListener):
     @asyncio.coroutine
     def on_message(self, message):
 
-        yield from message.reply(message)
+        yield from message.reply(message.text)
 
 
 class MyWSHandler(WSHandler):
@@ -30,96 +31,97 @@ class MyWSHandler(WSHandler):
     @asyncio.coroutine
     def on_close(self, code):
 
-        logger.info("+++ Session {} has been closed, client : {}".format(
+        print("+++ Session ({}) has been closed, client : {}".format(
             self.session_id, self.client))
 
     @asyncio.coroutine
     def on_error(self, e):
 
-        print("+++ Exception {} has been raised, client : {}".format(
+        print("+++ Exception ({}) has been raised, client : {}".format(
             e, self.client))
 
     @asyncio.coroutine
-    def on_message(self, message):
+    def on_message(self, text):
 
-        print("+++ Receice message \'{}\' has been received for client : {}".format(
-            message, self.client))
+        print("+++ Receice message ({}) has been received for client : {}".format(
+            text, self.client))
 
     @asyncio.coroutine
-    def on_send(self, message):
+    def on_send(self, text):
 
-        print("+++ Send message \'{}\' will be send to {}".format(
-            message, self.client))
+        print("+++ Send message ({}) will be send to {}".format(
+            text, self.client))
 
 
 class ServerTests(unittest.TestCase):
 
     def setUp(self):
-        self.loop = asyncio.get_event_loop()
-        # asyncio.set_event_loop(self.loop)
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
 
     def tearDown(self):
-        if self.loop.is_closed() is False:
-            # self.loop.close()
-            print("event loop is running")
+        self.loop.close()
 
-    def start_async_api(self):
+    def run_loop_once(self):
+        # Process callbacks scheduled with call_soon by appending a callback
+        # to stop the event loop then running it until it hits that callback.
+        self.loop.call_soon(self.loop.stop)
+        self.loop.run_forever()
 
-        handler = MyAPIClientListener(
-            REDIS_CONNECTION,
-            app_name=APP_NAME)
-
-        yield from handler.run()
-
-    @asyncio.coroutine
     def start_server(self):
 
         ws_connection = dict(
             host="127.0.0.1",
             port=WS_PORT)
 
-        server = WSServer(
+        self.server = WSServer(
             ws_connection=ws_connection,
             redis_connection=REDIS_CONNECTION,
             app_name=APP_NAME,
             ws_handler_class=MyWSHandler
         )
 
-        yield from server.run()
+        self.loop.run_until_complete(self.server.run())
 
-    @asyncio.coroutine
     def start_client(self, client):
 
-        result = yield from websockets.connect(
+        cor_connect = websockets.connect(
             'ws://127.0.0.1:{}/ws/{}'.format(WS_PORT, client))
 
-        return result
+        self.client_futrue = asyncio_ensure_future(cor_connect)
+        new_client = self.loop.run_until_complete(self.client_futrue)
+
+        return new_client
+
+    def start_api(self):
+
+        handler = MyAPIClientListener(
+            REDIS_CONNECTION,
+            app_name=APP_NAME)
+
+        self.api_future = asyncio_ensure_future(handler.run())
+        self.loop.call_soon_threadsafe(self.api_future)
 
     def test_01_send_one_client_async_api(self):
 
-        logger.info("in test 01")
-
         message = "Hello!"
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.start_server())
-        websocket = self.loop.run_until_complete(self.start_client("client01"))
 
-        logger.info(type(websocket))
-        if self.loop.is_closed() is False:
-            websocket = self.loop.run_until_complete(websocket.send(message))
-            logger.info("message has been sent to client")
-        else:
-            logger.info("+++++ event loop is closed !!!!")
+        self.start_api()
 
-        # tasks = asyncio.wait([
-        #     self.start_server(),
-        #     self.start_client("client01"),
+        self.start_server()
+        client01 = self.start_client("client01")
 
-        # ])
+        send_future = asyncio_ensure_future(client01.send(message))
+        self.loop.run_until_complete(send_future)
 
-        # done, pendding = self.loop.run_until_complete(tasks)
+        reply = self.loop.run_until_complete(client01.recv())
 
-        # reply = self.loop.run_until_complete(websocket.recv())
-        # print(reply)
-        # self.assertEqual(reply, "Hello!")
-        # self.loop.run_forever()
+        self.assertEqual(message, reply)
+
+        self.server.close()
+
+        if not self.client_futrue.cancelled():
+            self.client_futrue.cancel()
+
+        if not self.api_future.cancelled():
+            self.api_future.cancel()

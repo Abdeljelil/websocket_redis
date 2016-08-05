@@ -7,20 +7,20 @@ from websocket_redis.api import AbstractMessage
 class Message(AbstractMessage):
 
     def __init__(self, handler, session_id=None,
-                 client_id=None, message=None, create_on=None):
+                 client_id=None, text=None, create_on=None):
 
         self.handler = handler
         self.session_id = session_id
         self.client_id = client_id
-        self.message = message
+        self.text = text
         self.create_on = create_on
 
-    def reply(self, message):
+    def reply(self, text):
         """
         send message to the client
         """
         wrapped_message = dict(
-            message=message,
+            text=text,
             session_id=self.session_id,
             client_id=self.client_id,
             create_on=str(datetime.datetime.now()),

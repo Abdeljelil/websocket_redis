@@ -17,16 +17,16 @@ class MyWSHandler(WSHandler):
             e, self.client))
 
     @asyncio.coroutine
-    def on_message(self, message):
+    def on_message(self, text):
 
         print("Receice message \'{}\' has been received for client : {}".format(
-            message, self.client))
+            text, self.client))
 
     @asyncio.coroutine
-    def on_send(self, message):
+    def on_send(self, text):
 
         print("Send message \'{}\' will be send to {}".format(
-            message, self.client))
+            text, self.client))
 
 if __name__ == "__main__":
 
@@ -46,7 +46,9 @@ if __name__ == "__main__":
         ws_handler_class=MyWSHandler
     )
 
-    loop.run_until_complete(server.run())
-
-    loop.run_forever()
-    loop.close()
+    try:
+        loop.run_until_complete(server.run())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        server.close()
+        loop.close()

@@ -102,12 +102,12 @@ class WSHandler(object):
 
     @abc.abstractmethod
     @asyncio.coroutine
-    def on_message(self, message):
+    def on_message(self, text):
         """
         Override this method if you want to handle the receive of message
         before the publish.
         Args:
-            message : str, message has been sent
+            text : str, message has been sent
                     form the client to web-socket server
         this method is coroutine                
         """
@@ -115,33 +115,33 @@ class WSHandler(object):
 
     @abc.abstractmethod
     @asyncio.coroutine
-    def on_send(self, message):
+    def on_send(self, text):
         """
         Override this method if you want to add
         extra work before the send of messages to client
 
         Args:
-            message : str, message to send to client
+            text : str, message to send to client
 
         this method is coroutine
         """
         pass
 
     @asyncio.coroutine
-    def publish(self, message):
+    def publish(self, text):
         """
         listing message from the client and push the message to Redis
         to broadcast it to the API
         """
 
-        yield from self.on_message(message)
+        yield from self.on_message(text)
 
         logger.info("Message received from {}, content: {}".format(
-            self.client, message))
+            self.client, text))
 
         msg_to_api = dict(client_id=self.client,
                           session_id=self.session_id,
-                          message=message,
+                          text=text,
                           create_on=str(datetime.datetime.now())
                           )
 
@@ -157,11 +157,10 @@ class WSHandler(object):
             wrapped_msg = yield from self.channel.get(encoding='utf-8')
 
             decoded_msg = json.loads(wrapped_msg)
-            message = decoded_msg["message"]
+            message = decoded_msg["text"]
 
             yield from self.on_send(message)
 
             logger.info("{} message in {}: {}".format(
                 self.session_id, self.channel.name, message))
             return message
-        return None

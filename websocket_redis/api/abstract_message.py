@@ -7,10 +7,10 @@ class AbstractMessage(object):
 
         return "<Message client_id:{}, message:\'{}\'>".format(
             self.client_id,
-            self.message
+            self.text
         )
 
     @abc.abstractmethod
-    def replay(self, message):
+    def replay(self, text):
 
         raise NotImplementedError("Please Implement this method")

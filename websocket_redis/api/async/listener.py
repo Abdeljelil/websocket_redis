@@ -46,5 +46,6 @@ class APIClientListener(AbstractListener):
     @asyncio.coroutine
     def send(self, client_id, message):
         logger.info("send message {} to {}".format(client_id, message))
+
         channel_name = "{}:{}".format(self.app_name, client_id)
         yield from self.redis.publish(channel_name, message)

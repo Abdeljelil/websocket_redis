@@ -4,13 +4,6 @@ import datetime
 from websocket_redis.api.async import APIClientListener
 
 
-@asyncio.coroutine
-def iowait(val):
-    print("in sleep")
-    yield from asyncio.sleep(val)
-    print("end sleep")
-
-
 class MyAPIClientListener(APIClientListener):
 
     @asyncio.coroutine

@@ -6,7 +6,7 @@ class MyAPIClientListener(APIClientListener):
 
     def on_message(self, message):
 
-        print("in new on message function")
+        print("new message {}".format(message.text))
         new_massage = "thread hi, {} , {}".format(
             message.client_id,
             datetime.datetime.now()

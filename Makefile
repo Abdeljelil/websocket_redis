@@ -2,8 +2,8 @@ export PYTHONASYNCIODEBUG=1
 export PYTHONWARNINGS=default
 
 test:
-	# python -m unittest
-	nosetests
+	python -m unittest
+	#nosetests
 
 pylint:
 	pylint -f parseable websocket_redis/ --rcfile .pylint

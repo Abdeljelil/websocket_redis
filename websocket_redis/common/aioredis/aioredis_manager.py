@@ -1,5 +1,9 @@
 import asyncio
 import aioredis
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class RedisManagerAIO(object):
@@ -16,6 +20,8 @@ class RedisManagerAIO(object):
         self.encoding = encoding
         self.loop = loop
         self.redis_global_connection = None
+
+        self._connections = []
 
     @asyncio.coroutine
     def _get_connection(self):
@@ -34,6 +40,29 @@ class RedisManagerAIO(object):
         )
         return connection
 
+    def _wait_closed(self, connection):
+        loop = asyncio.get_event_loop()
+        try:
+
+            loop.run_until_complete(
+                asyncio.wait_for(
+                    connection.wait_closed(),
+                    timeout=1))
+        except asyncio.TimeoutError:
+            logger.warning("redis connectin failed to stop")
+
+    def close(self):
+
+        if self.redis_global_connection.closed is False:
+            logger.info("closing global redis connection")
+            self.redis_global_connection.close()
+            self._wait_closed(self.redis_global_connection)
+        for connection in self._connections:
+            if connection.closed is False:
+                logger.info("closing push/sub redis connection")
+                self.connection.close()
+                self._wait_closed(self.connection)
+
     @asyncio.coroutine
     def init(self):
         """
@@ -50,5 +79,5 @@ class RedisManagerAIO(object):
         this function is coroutine
         """
         sub_connection = yield from self._get_connection()
-
+        self._connections.append(sub_connection)
         return sub_connection
