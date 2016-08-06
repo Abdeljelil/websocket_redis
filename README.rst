@@ -81,7 +81,6 @@ Async API:
 .. code:: python
 
     import asyncio
-    import datetime
     
     from websocket_redis.api.async import APIClientListener
 
@@ -91,13 +90,8 @@ Async API:
         @asyncio.coroutine
         def on_message(self, message):
     
-            print(" in new on message function")
-            new_massage = "async hi, {} , {}".format(
-                message.client_id,
-                datetime.datetime.now()
-            )
-            yield from message.reply(new_massage)
-
+            print("new message {}".format(message.text))
+            yield from message.reply("Hi!")
 
     redis_connection = dict(
         address=("localhost", 6379)
@@ -109,32 +103,26 @@ Async API:
 
 Threaded API:
 
-import datetime
+.. code:: python
 
-from websocket_redis.api.threading import APIClientListener
-
-
-class MyAPIClientListener(APIClientListener):
-
-    def on_message(self, message):
-
-        print("new message {}".format(message.text))
-        new_massage = "thread hi, {} , {}".format(
-            message.client_id,
-            datetime.datetime.now()
+    from websocket_redis.api.threading import APIClientListener
+    
+    
+    class MyAPIClientListener(APIClientListener):
+    
+        def on_message(self, message):
+    
+            print("new message {}".format(message.text))
+            message.reply("Hi!")
+    
+        redis_connection = dict(
+            host="localhost",
+            port=6379
         )
+        handler = MyAPIClientListener(redis_connection, app_name="test_app")
+    
+        handler.run()
 
-        message.reply(new_massage)
-
-if __name__ == "__main__":
-
-    redis_connection = dict(
-        host="localhost",
-        port=6379
-    )
-    handler = MyAPIClientListener(redis_connection, app_name="test_app")
-
-    handler.run()
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websokcer_redis.svg
     :target: https://pypi.python.org/pypi/websokcer_redis
     :alt: Python versions supported
