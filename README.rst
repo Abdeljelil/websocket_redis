@@ -144,7 +144,7 @@ Threaded API:
     
         handler.run()
 
-.. |cversion| image:: https://travis-ci.org/Abdeljelil/websocket_redis.svg?branch=master
+.. |build| image:: https://travis-ci.org/Abdeljelil/websocket_redis.svg?branch=master
     :target: https://travis-ci.org/Abdeljelil/websocket_redis
     :alt: Travis-ci build
 .. |cversion| image:: https://img.shields.io/pypi/v/websocket_redis.svg
