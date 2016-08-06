@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 class WSServer(object):
 
-    def __init__(self, ws_connection, redis_connection, app_name="myapp", ws_handler_class=WSHandler):
+    def __init__(self, ws_connection, redis_connection,
+                 app_name="myapp", ws_handler_class=WSHandler):
 
         self.ws_connection = ws_connection
         self.redis_connection = redis_connection

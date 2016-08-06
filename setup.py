@@ -4,31 +4,39 @@ import sys
 
 from setuptools import find_packages, setup
 
-version = ("0", "0", "5")
+version = ("0", "0", "8")
 
 
 root = os.path.dirname(__file__)
+readme_file = os.path.join(root, 'README.md')
 
-with open(os.path.join(root, 'README.md')) as f:
-    long_description = '\n\n'.join(f.read().split('\n\n')[1:])
+if os.path.isfile(readme_file):
+    with open(readme_file) as f:
+        long_description = '\n\n'.join(f.read().split('\n\n')[1:])
+else:
+    long_description = ""
 
 py_version = sys.version_info[:2]
 
 if py_version < (3, 3):
+
     install_requires = ["redis"]
 
     packages = find_packages(exclude=(
         "websocket_redis.common.aioredis",
         "websocket_redis.api.async",
         "websocket_redis.server",
+        "tests"
     ))
 else:
+
     install_requires = [
         "websockets",
         "aioredis",
         "redis"
     ]
-    packages = find_packages(exclude=["tests"])
+
+    packages = find_packages(exclude=("tests"))
 
 setup(
     name="websocket_redis",
@@ -61,3 +69,8 @@ setup(
         ],
     },
 )
+
+print(py_version)
+print(packages)
+print(install_requires)
+print(version)
