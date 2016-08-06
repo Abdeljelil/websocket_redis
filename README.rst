@@ -1,11 +1,16 @@
 |  |versions| |status| |codecov|
 
-# Websocket_redis
-``websocket_redis`` is an asynchronous python module gather two projects [websockets](https://github.com/aaugustin/websockets/) and [aioredis](https://github.com/aio-libs/aioredis/) to make the communication between the client and backend as easy as possible without losing any message has been sent from the client.
-## Installation
+Websocket_redis
+=============
+``websocket_redis`` is an asynchronous python module gather two projects `websockets <https://github.com/aaugustin/websockets>`_ and `aioredis <https://github.com/aio-libs/aioredis>`_ to make the communication between the client and backend as easy as possible without losing any message has been sent from the client.
+
+Installation
+----------------
 `pip install websocket_redis`
-Url in [pypi](https://pypi.python.org/pypi/websocket_redis)
-## Usage
+`pypi <https://pypi.python.org/pypi/websocket_redis>`_.
+
+Usage
+-----
 TODO: 
 
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websokcer_redis.svg
