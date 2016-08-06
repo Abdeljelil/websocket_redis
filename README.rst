@@ -153,8 +153,8 @@ Threaded API:
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis
     :alt: Python versions supported
-.. |codecov| image:: http://codecov.io/github/nedbat/coveragepy/websocket_redis.svg?branch=master
-    :target: http://codecov.io/github/nedbat/coveragepy?branch=master
+.. |codecov| image:: https://codecov.io/github/Abdeljelil/websocket_redis/websocket_redis.svg?branch=master
+    :target: http://codecov.io/github/Abdeljelil/websocket_redis?branch=master
     :alt: Coverage!
 .. |status| image:: https://img.shields.io/pypi/status/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis

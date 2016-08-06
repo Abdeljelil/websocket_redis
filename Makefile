@@ -23,7 +23,7 @@ publish-test:
 publish:
 	python setup.py register -r pypi
 	python setup.py sdist upload -r pypi
-
+	
 clean:
 	find . -name '*.pyc' -delete
 	find . -name __pycache__ -delete
