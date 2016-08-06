@@ -1,4 +1,4 @@
-| |cversion| |versions| |status| |codecov|
+| |cversion| |versions| |status| |codecov| |build|
 
 Websocket_redis
 =============
@@ -144,6 +144,9 @@ Threaded API:
     
         handler.run()
 
+.. |cversion| image:: https://travis-ci.org/Abdeljelil/websocket_redis.svg?branch=master
+    :target: https://travis-ci.org/Abdeljelil/websocket_redis
+    :alt: Travis-ci build
 .. |cversion| image:: https://img.shields.io/pypi/v/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis
     :alt: Python versions supported
