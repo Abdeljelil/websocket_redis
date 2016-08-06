@@ -109,7 +109,7 @@ class WSHandler(object):
         Args:
             text : str, message has been sent
                     form the client to web-socket server
-        this method is coroutine                
+        this method is coroutine
         """
         pass
 

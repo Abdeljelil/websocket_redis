@@ -2,11 +2,10 @@ import asyncio
 import logging
 
 import websockets
-from websockets.exceptions import ConnectionClosed
-
 from websocket_redis.common import asyncio_ensure_future
 from websocket_redis.common.aioredis import RedisManagerAIO
 from websocket_redis.server.ws_handler import WSHandler
+from websockets.exceptions import ConnectionClosed
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,8 @@ import unittest
 import websockets
 
 from websocket_redis.api.async import APIClientListener as BaseAsyncAPIListener
-from websocket_redis.api.threading import APIClientListener as BaseThreadAPIListener
+from websocket_redis.api.threading import \
+    APIClientListener as BaseThreadAPIListener
 from websocket_redis.common import asyncio_ensure_future
 from websocket_redis.server import WSHandler, WSServer
 

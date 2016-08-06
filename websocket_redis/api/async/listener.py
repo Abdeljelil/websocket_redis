@@ -3,7 +3,6 @@ import json
 import logging
 
 import aioredis
-
 from websocket_redis.api import AbstractListener
 from websocket_redis.api.async.message import Message
 from websocket_redis.common.aioredis import RedisManagerAIO
