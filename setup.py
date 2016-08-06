@@ -4,11 +4,11 @@ import sys
 
 from setuptools import find_packages, setup
 
-version = ("0", "0", "9")
+version = ("0", "1", "1")
 
 
 root = os.path.dirname(__file__)
-readme_file = os.path.join(root, 'README.md')
+readme_file = os.path.join(root, 'README.rst')
 
 if os.path.isfile(readme_file):
     with open(readme_file) as f:
