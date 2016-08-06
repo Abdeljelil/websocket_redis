@@ -76,11 +76,65 @@ Start Websocker server:
         server.close()
         loop.close()
 
-Start Websocker server:
+Async API:
 
 .. code:: python
-TODO: 
 
+    import asyncio
+    import datetime
+    
+    from websocket_redis.api.async import APIClientListener
+
+
+    class MyAPIClientListener(APIClientListener):
+    
+        @asyncio.coroutine
+        def on_message(self, message):
+    
+            print(" in new on message function")
+            new_massage = "async hi, {} , {}".format(
+                message.client_id,
+                datetime.datetime.now()
+            )
+            yield from message.reply(new_massage)
+
+
+    redis_connection = dict(
+        address=("localhost", 6379)
+    )
+    handler = MyAPIClientListener(redis_connection, app_name="test_app")
+    loop = asyncio.get_event_loop()
+    
+    loop.run_until_complete(handler.run())
+
+Threaded API:
+
+import datetime
+
+from websocket_redis.api.threading import APIClientListener
+
+
+class MyAPIClientListener(APIClientListener):
+
+    def on_message(self, message):
+
+        print("new message {}".format(message.text))
+        new_massage = "thread hi, {} , {}".format(
+            message.client_id,
+            datetime.datetime.now()
+        )
+
+        message.reply(new_massage)
+
+if __name__ == "__main__":
+
+    redis_connection = dict(
+        host="localhost",
+        port=6379
+    )
+    handler = MyAPIClientListener(redis_connection, app_name="test_app")
+
+    handler.run()
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websokcer_redis.svg
     :target: https://pypi.python.org/pypi/websokcer_redis
     :alt: Python versions supported
