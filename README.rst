@@ -4,11 +4,32 @@ Websocket_redis
 =============
 ``websocket_redis`` is an asynchronous python module gather two projects `websockets <https://github.com/aaugustin/websockets>`_ and `aioredis <https://github.com/aio-libs/aioredis>`_ to make the communication between the client and backend as easy as possible without losing any message has been sent from the client.
 
+=============
 Installation
-------------
-.. code:: shell
-`pip install websocket_redis` 
+=============
 
+Install from Pypi:
+________________________
+
+.. code-block:: bash
+
+    $ pip install websocket_redis
+
+Manually installation:
+________________________
+
+.. code-block:: bash
+    
+    # we assume you already created the python virtualenv
+    # get the latst version from master branch
+    $ wget -O websocket_redis.zip https://github.com/Abdeljelil/websocket_redis/archive/master.zip
+    $ unzip websocket_redis.zip
+    $ cd websocket_redis-master
+    $ make install
+    # run tests (optional)
+    $ pip install nose
+    $ make test
+    
 `pypi <https://pypi.python.org/pypi/websocket_redis>`_.
 
 Usage examples
