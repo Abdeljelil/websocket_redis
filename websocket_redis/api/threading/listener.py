@@ -16,6 +16,8 @@ class APIClientListener(AbstractListener):
         self.redis_connection = redis_connection
         self.app_name = app_name
         self.redis = None
+        self.threads = []
+        self._is_active = True
 
     def run(self,):
 
@@ -26,7 +28,7 @@ class APIClientListener(AbstractListener):
         redis_sub = redis_manager.get_sub_connection()
         redis_sub.subscribe(self.app_name)
 
-        while True:
+        while self._is_active:
             message = redis_sub.get_message()
             if message:
                 if message["type"] == 'message':
@@ -45,7 +47,17 @@ class APIClientListener(AbstractListener):
         thread = Thread(target=self.on_message, args=(message, ))
         thread.start()
 
+        self.threads.append(thread)
+
     def send(self, client_id, message):
         logger.info("send message {} to {}".format(client_id, message))
         channel_name = "{}:{}".format(self.app_name, client_id)
         self.redis.publish(channel_name, message)
+
+    def close(self):
+
+        for thread in self.threads:
+            print(thread)
+            print(type(thread))
+
+        self._is_active = False

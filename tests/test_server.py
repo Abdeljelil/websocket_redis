@@ -4,7 +4,8 @@ import unittest
 
 import websockets
 
-from websocket_redis.api.async import APIClientListener
+from websocket_redis.api.async import APIClientListener as BaseAsyncAPIListener
+from websocket_redis.api.threading import APIClientListener as BaseThreadAPIListener
 from websocket_redis.common import asyncio_ensure_future
 from websocket_redis.server import WSHandler, WSServer
 
@@ -19,12 +20,26 @@ REDIS_CONNECTION = dict(
 )
 
 
-class MyAPIClientListener(APIClientListener):
+class ThreadAPIListener(BaseThreadAPIListener):
+
+    def on_message(self, message):
+
+        if message.client_id == "client01":
+            message.reply("pong-thread!")
+        else:
+            message.reply("faild")
+
+
+class AsyncAPIListener(BaseAsyncAPIListener):
 
     @asyncio.coroutine
     def on_message(self, message):
 
-        yield from message.reply(message.text)
+        # message.text
+        if message.client_id == "client01":
+            yield from message.reply("pong!")
+        else:
+            yield from message.reply("faild")
 
 
 class MyWSHandler(WSHandler):
@@ -63,12 +78,6 @@ class ServerTests(unittest.TestCase):
     def tearDown(self):
         self.loop.close()
 
-    def run_loop_once(self):
-        # Process callbacks scheduled with call_soon by appending a callback
-        # to stop the event loop then running it until it hits that callback.
-        self.loop.call_soon(self.loop.stop)
-        self.loop.run_forever()
-
     def start_server(self):
 
         ws_connection = dict(
@@ -94,20 +103,66 @@ class ServerTests(unittest.TestCase):
 
         return new_client
 
-    def start_api(self):
+    def start_async_api(self):
 
-        handler = MyAPIClientListener(
+        handler = AsyncAPIListener(
             REDIS_CONNECTION,
             app_name=APP_NAME)
 
         self.api_future = asyncio_ensure_future(handler.run())
         self.loop.call_soon_threadsafe(self.api_future)
 
+    def start_threaded_api(self):
+
+        redis_connection = dict(
+            host=REDIS_CONNECTION["address"][0],
+            port=REDIS_CONNECTION["address"][1],
+        )
+        self.thread_api = ThreadAPIListener(
+            redis_connection,
+            app_name=APP_NAME)
+
+        self.loop.run_in_executor(None, self.thread_api.run)
+
     def test_01_send_one_client_async_api(self):
 
-        message = "Hello!"
+        message = "ping!"
 
-        self.start_api()
+        # start asynchronous api
+        self.start_async_api()
+
+        # start websocker server
+        self.start_server()
+
+        # start client simulator
+        client01 = self.start_client("client01")
+
+        # simulate send message from client
+        send_future = asyncio_ensure_future(client01.send(message))
+        self.loop.run_until_complete(send_future)
+
+        # wait response from the api
+        reply = self.loop.run_until_complete(client01.recv())
+
+        # the reply should be pong from the api
+        self.assertEqual("pong!", reply)
+
+        # close all connections
+        self.server.close()
+
+        if not self.client_futrue.cancelled():
+            self.client_futrue.cancel()
+
+        if not self.api_future.cancelled():
+
+            self.api_future.cancel()
+
+    def test_02_send_one_client_threaded_api(self):
+
+        print("-" * 20, " test02 ", "-" * 20)
+        message = "ping!"
+
+        self.start_threaded_api()
 
         self.start_server()
         client01 = self.start_client("client01")
@@ -116,13 +171,12 @@ class ServerTests(unittest.TestCase):
         self.loop.run_until_complete(send_future)
 
         reply = self.loop.run_until_complete(client01.recv())
-
-        self.assertEqual(message, reply)
+        print("*" * 30, reply)
+        self.assertEqual("pong-thread!", reply)
 
         self.server.close()
 
         if not self.client_futrue.cancelled():
             self.client_futrue.cancel()
 
-        if not self.api_future.cancelled():
-            self.api_future.cancel()
+        self.thread_api.close()
