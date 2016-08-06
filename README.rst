@@ -1,4 +1,4 @@
-|  |versions| |status| |codecov|
+| |cversion| |versions| |status| |codecov|
 
 Websocket_redis
 =============
@@ -123,6 +123,9 @@ Threaded API:
     
         handler.run()
 
+.. |cversion| image:: https://img.shields.io/pypi/v/websocket_redis.svg
+    :target: https://pypi.python.org/pypi/websocket_redis
+    :alt: Python versions supported
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis
     :alt: Python versions supported
