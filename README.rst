@@ -1,4 +1,4 @@
-| |cversion| |versions| |status| |codecov| |build|
+| |cversion| |versions| |status| |codecov| |build| |health|
 
 Websocket_redis
 =============
@@ -153,9 +153,12 @@ Threaded API:
 .. |versions| image:: https://img.shields.io/pypi/pyversions/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis
     :alt: Python versions supported
-.. |codecov| image:: https://codecov.io/github/Abdeljelil/websocket_redis/websocket_redis.svg?branch=master
-    :target: http://codecov.io/github/Abdeljelil/websocket_redis?branch=master
+.. |codecov| image:: https://codecov.io/gh/Abdeljelil/websocket_redis/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/Abdeljelil/websocket_redis
     :alt: Coverage!
 .. |status| image:: https://img.shields.io/pypi/status/websocket_redis.svg
     :target: https://pypi.python.org/pypi/websocket_redis
     :alt: Package stability
+.. |health| image:: https://landscape.io/github/Abdeljelil/websocket_redis/master/landscape.svg?style=flat
+    :target: hhttps://landscape.io/github/Abdeljelil/websocket_redis
+    :alt: Package health
