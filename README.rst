@@ -15,7 +15,7 @@ ________________________
 
     $ pip install websocket_redis
 
-Manually installation:
+Manual installation:
 ________________________
 
 .. code-block:: bash
